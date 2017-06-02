@@ -1,0 +1,24 @@
+{% if error_message %}
+    <p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+<form action="{% url 'blog:post' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="article_title" value="{{article_title}}" />
+    <input type="text" name="article_body" value="{{article_body}}" />
+    <input type="submit" value="article_data" />
+</form>
+
+{% if fresh_article_list %}
+    <ul>
+        {% for article in fresh_article_list %}
+        <li>
+            <a href="{% url 'blog:detail' article.id %}">
+                {{ article.article_title }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p> No article are available </p>
+{% endif %}
