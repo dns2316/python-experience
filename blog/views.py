@@ -23,10 +23,9 @@ def detail_article(request, article_id):
 def post_article(request):
     article = get_object_or_404(Article)
     try:
-        article.article_title.get(pk = request.POST['article_title'])
-        article.article_text.get(pk = request.POST['article_text'])
-    except (KeyError, Article.DoesNotExist):
-        return render(request, 'blog/')
-    else:
+        article.article_title = request.POST['article_title']
+        article.article_text = request.POST['article_text']
         article.save()
-        return HttpResponseRedirect(reverse('blog:index', args=(article.id)))
+        return render(request, 'blog/article.html', { 'article':article })
+    except (Article.DoesNotExist):
+        return render(request, 'blog:index')

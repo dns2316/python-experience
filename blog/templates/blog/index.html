@@ -5,7 +5,7 @@
 <form action="{% url 'blog:post' %}" method="post">
     {% csrf_token %}
     <input type="text" name="article_title" value="{{article_title}}" />
-    <input type="text" name="article_body" value="{{article_body}}" />
+    <input type="text" name="article_text" value="{{article_text}}" />
     <input type="submit" value="article_data" />
 </form>
 
