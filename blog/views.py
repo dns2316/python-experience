@@ -1,4 +1,7 @@
 from django.shortcuts import get_object_or_404, render
+from django.views import generic
+from django.utils import timezone
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 # from django.template import RequestContext, loader
@@ -8,24 +11,26 @@ from .models import Article
 
 
 # Create your views here.
-def index(request):
-    fresh_article_list = Article.objects.order_by('-pub_date')[:5]
-    context = {
-        'fresh_article_list': fresh_article_list,
-    }
-    return render(request, 'blog/index.html', context)
+class IndexView(generic.ListView):
+    template_name = 'blog/index.html'
+    context_object_name = 'fresh_article_list'
+
+    def get_queryset(self):
+        """Return the last five published articles"""
+        return Article.objects.filter(
+            pub_date__lte=timezone.now()
+        ).order_by('-pub_date')[:5]
 
 
-def detail_article(request, article_id):
-    article = get_object_or_404(Article, pk = article_id)
-    return render(request, 'blog/article.html', { 'article':article })
+class DetailArticle(generic.DetailView):
+    model = Article
+    template_name = 'blog/article.html'
+    def get_queryset(self):
+        return Article.objects.filter(pub_date__lte <= timezone.now())
 
 def post_article(request):
-    article = get_object_or_404(Article)
-    try:
-        article.article_title = request.POST['article_title']
-        article.article_text = request.POST['article_text']
-        article.save()
-        return render(request, 'blog/article.html', { 'article':article })
-    except (Article.DoesNotExist):
-        return render(request, 'blog:index')
+    article = Article.objects.create(
+        article_title = request.POST['article_title'],
+        article_text = request.POST['article_text'],
+    )
+    return render(request, 'blog/article.html', { 'article':article })
